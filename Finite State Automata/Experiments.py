@@ -18,7 +18,7 @@ def experiments(): # let length vary
                 print(f"Trial: {trial}. NUMBER OF STATES: {i}. LENGTH OF ALPHABET: {length}. ALPHABET: {alphabet}")
                 Transition_struct = RandomTransitionStructure(i, alphabet)
                 Transition_struct.generateRandomTransitionStructure(trial) #TODO only for debugging purposes, remove times parameter later 
-                strings, filtered, isInfinite = Transition_struct.BFSString(m=i)
+                strings, filtered, isInfinite = Transition_struct.BFSString(m=i, trial=trial)
                 data.append([i, length, len(strings), isInfinite]) # num of states, num of strings to find, num strings found, is_infinite
             
             

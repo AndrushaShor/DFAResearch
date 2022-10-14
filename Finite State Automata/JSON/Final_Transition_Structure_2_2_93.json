@@ -1,1 +1,1 @@
-{"Adjacency_List": "{1: [2], 2: [1]}", "end_states": "{1: 'end_state', 2: 'not_end_state'}", "Nodes": "[1, 2]", "Edges": "[(1, 2, 'j'), (1, 2, 'w'), (2, 1, 'j')]"}
+{"adj_List": "{1: [2], 2: [1, 2]}", "end_states": "{1: 'end_state', 2: 'end_state'}", "nodes": "[1, 2]", "edges": "[(1, 2, 'l'), (2, 1, 'l'), (2, 2, 't')]", "imgFP": "./InfDFA/Final_Transition_Structure_2_2_93.png", "isInfinite": "True"}

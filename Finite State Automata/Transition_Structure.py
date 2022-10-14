@@ -5,6 +5,7 @@ import random
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import os
 #from netgraph import Graph
 from collections import defaultdict
 class TransitionStructure():
@@ -153,21 +154,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         TransitionStruct, order = self.partition_to_transition_structure(partition, self.alphabet, self.n) 
         self.TransitionStructure = self.compute_transition_structure(TransitionStruct, order, trial)
         
-        # File path for json file
-        filepath = 'JSON/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
-        A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
-        #print(A)
-        #print(f'Nodes: {self.TransitionStructure.get_nodes()}')
-        #print(f"Edges: {self.TransitionStructure.get_graph().edges(data='label')}")
-        info = {
-            "Adjacency_List" : str(A),
-            "end_states" : str(self.end_states),
-            "Nodes" : str(self.TransitionStructure.get_nodes()),
-            "Edges" : str(self.TransitionStructure.get_graph().edges(data='label'))
-        }
-
-        with open(filepath, "w") as outfile:
-            json.dump(info, outfile)
+        
         
 
 
@@ -195,8 +182,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         #print(f"mapping: {mapping}")
         TransitionStruct.relabel_nodes(mapping)
         #self.n, self.alphabet
-        filepath = 'DFAs/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
-        TransitionStruct.draw_graph(filepath)
+
         
         # up to here
         return TransitionStruct
@@ -323,57 +309,9 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         return self.TransitionStructure
 
 
-    # code for cycle detection
-    # def checkCycle(self, G):
-    #     print(nx.cycle_basis(G, 1))
-    #     # visited = [False] * len(list(G.nodes))
-    #     # #stack = []
-
-    #     # for v, vertex in enumerate(list(G.nodes)):
-    #     #     if visited[v] == False:
-    #     #         stack = []
-    #     #         stack.append(vertex)
-    #     #         visited[v] = True
-    #     #         self.processDFSTree(G, stack, visited)
-
-        
-    # def processDFSTree(self, G, stack, visited):
-    #     A = nx.to_dict_of_lists(G)
-    #     nodesToVisit = list(A.keys())[-1]
-        
-    #     for v, vertex in enumerate(A[nodesToVisit]): # A[-1] is stack at top
-    #         if visited[v] == True: # in the stack
-    #             self.printCycle(stack, vertex)
-    #         elif visited[v] == False:
-    #             stack.append(vertex)
-    #             visited[v] = True
-    #             self.processDFSTree(G, stack, visited)
-            
-        
-    #     visited[stack[-1] - 1] = True
-    #     stack.pop()
-
-
-    # def printCycle(self, stack, vertex):
-    #     print(f"Starting stack: {stack}")
-    #     tempStack = []
-    #     tempStack.append(stack[-1])
-    #     stack.pop()
-    #     print(f"Current stack: {stack}")
-
-    #     while tempStack[-1] != vertex:
-    #         tempStack.append(stack[-1])
-    #         stack.pop()
-        
-    #     while len(tempStack) != 0: 
-    #         print(f"{tempStack[-1]} ->", end='')
-    #         stack.append(tempStack[-1])
-    #         tempStack.pop()
-        
-
     #TODO: Some DFAs might not print any strings.
     # this is by design, and needs to be an edge case that gets hand
-    def BFSString(self, m): # change to m -> breaking condition is that if I have a string of 2m + 1 -> infinite language
+    def BFSString(self, m, trial): # change to m -> breaking condition is that if I have a string of 2m + 1 -> infinite language
         
         if self.TransitionStructure == None:
             print("Create a Transition Structure First")
@@ -453,6 +391,31 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         if len(filtered) > 0:
             print("Infinite")
             isInfinite = True
+        
+        DFAfp = ""
+        if isInfinite:
+            DFAfp = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+        else:
+            DFAfp = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+        self.TransitionStructure.draw_graph(DFAfp)
+        # File path for json file
+        filepath = 'JSON/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
+        A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
+        #print(A)
+        #print(f'Nodes: {self.TransitionStructure.get_nodes()}')
+        #print(f"Edges: {self.TransitionStructure.get_graph().edges(data='label')}")
+        info = {
+            "adj_List" : str(A),
+            "end_states" : str(self.end_states),
+            "nodes" : str(self.TransitionStructure.get_nodes()),
+            "edges" : str(self.TransitionStructure.get_graph().edges(data='label')),
+            "imgFP" : DFAfp,
+            "isInfinite" : str(isInfinite)
+
+        }
+
+        with open(filepath, "w") as outfile:
+            json.dump(info, outfile)
         return strings, filtered, isInfinite
 
     def debug(self):

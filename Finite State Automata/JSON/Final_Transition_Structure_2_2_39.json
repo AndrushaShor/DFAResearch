@@ -1,1 +1,0 @@
-{"Adjacency_List": "{1: [2], 2: [1]}", "end_states": "{1: 'end_state', 2: 'not_end_state'}", "Nodes": "[1, 2]", "Edges": "[(1, 2, 'o'), (2, 1, 'i')]"}
