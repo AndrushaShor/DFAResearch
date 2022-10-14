@@ -1,0 +1,1 @@
+{"adj_List": "{1: [1, 2], 2: [3, 4], 3: [1, 4], 4: [2]}", "end_states": "{1: 'end_state', 2: 'end_state', 3: 'end_state', 4: 'end_state'}", "nodes": "[1, 2, 3, 4]", "edges": "[(1, 1, 'h'), (1, 2, 't'), (2, 3, 'h'), (2, 4, 't'), (3, 1, 'h'), (3, 4, 't'), (4, 2, 'h'), (4, 2, 't')]", "imgFP": "InfDFA/Final_Transition_Structure_4_2_22.png", "isInfinite": "True"}

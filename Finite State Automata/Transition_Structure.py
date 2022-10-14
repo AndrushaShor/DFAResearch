@@ -393,13 +393,16 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             isInfinite = True
         
         DFAfp = ""
+        filepath = ""
         if isInfinite:
             DFAfp = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            filepath = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
         else:
             DFAfp = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            filepath = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
         self.TransitionStructure.draw_graph(DFAfp)
         # File path for json file
-        filepath = 'JSON/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
+        
         A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
         #print(A)
         #print(f'Nodes: {self.TransitionStructure.get_nodes()}')
