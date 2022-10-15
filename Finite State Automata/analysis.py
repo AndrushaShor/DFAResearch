@@ -74,7 +74,7 @@ def analysis3(df):
 
 def visualize2(d, df, xlabel, ylabel):
     states = list(df.num_states.unique())
-    lengths = [5,10,15,20,25]
+    lengths = [2,4,6,8,10]
     for state in states:
         L = d[state]
         inf = []
