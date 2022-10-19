@@ -324,10 +324,8 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         if all(value == 'not_end_state' for value in self.end_states.values()): # edge case when no end states
             return strings, [], False # might change to -1
         
-        #print(A)
-        start = 0 # index of starting node in the graph
-        # self.checkCycle(self.TransitionStructure.get_graph())
 
+        start = 0 # index of starting node in the graph
 
         queue = [] # create a queue for BFS 
         
@@ -341,12 +339,8 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         flag = False
         
 
-
-        #currString = ""
-        #visited = []
         # if and only if we can get into a cycle that contains at least 1 end state in it (good question to figure out probability)
         strlen = 0
-        #print(f"end_states: {self.end_states}")
 
         # ISSUES: 
         # 1: No way to get to end state
@@ -434,9 +428,9 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             with open(test_json_fp, "w") as outfile:
                 json.dump(info, outfile)
             
-        self.TransitionStructure.draw_graph('result.png')
-        print(A)
-        print(self.TransitionStructure.get_graph().edges(data='label'))
+        #self.TransitionStructure.draw_graph('result.png')
+        #print(A)
+        #print(self.TransitionStructure.get_graph().edges(data='label'))
         return strings, filtered, isInfinite
 
     def debug(self):
@@ -447,11 +441,11 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
 
 def main():
     # graphical library limitation
-    tester = RandomTransitionStructure(3,['a', 'b','c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']) # clarify this with Turbo on Friday
+    tester = RandomTransitionStructure(4,['a', 'b','c', 'd', 'e', 'f', 'g', 'h']) # clarify this with Turbo on Friday
     tester.generateRandomTransitionStructure()
     #tester.debug()
     strings, filtered, isInfinite = tester.BFSString(m=1, flag = True)
-    print(strings)
-    print(isInfinite)
+    #print(strings)
+    #print(isInfinite)
 if __name__ == "__main__":
     main()
