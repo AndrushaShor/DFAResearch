@@ -52,4 +52,4 @@ def writeToCsv(filename, header, data):
         writer.writerows(data)
         #writer.close()
 if __name__ == '__main__':
-    experiments(3)
+    experiments(4)

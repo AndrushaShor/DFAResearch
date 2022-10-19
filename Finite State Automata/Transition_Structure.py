@@ -311,7 +311,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
 
     #TODO: Some DFAs might not print any strings.
     # this is by design, and needs to be an edge case that gets hand
-    def BFSString(self, m, trial=None, flag=False): # change to m -> breaking condition is that if I have a string of 2m + 1 -> infinite language
+    def BFSString(self, m, trial): # change to m -> breaking condition is that if I have a string of 2m + 1 -> infinite language
         
         if self.TransitionStructure == None:
             print("Create a Transition Structure First")
@@ -341,7 +341,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
 
         # if and only if we can get into a cycle that contains at least 1 end state in it (good question to figure out probability)
         strlen = 0
-
+        self.TransitionStructure.draw_graph('result.png')
         # ISSUES: 
         # 1: No way to get to end state
         # Approach: 
@@ -371,7 +371,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
                         
                                                 
                         strlen = len(currString + character)
-                        #print(f"strlen: {strlen}")
+                        print(f"strlen: {strlen}")
                         #print(f"strings: {len(strings)}")
                         queue.append((vertex, currString + character))
 
@@ -386,20 +386,20 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             print("Infinite")
             isInfinite = True
         
-        if not flag:
-            DFAfp = ""
-            filepath = ""
-            if isInfinite:
-                DFAfp = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
-                filepath = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
-            else:
-                DFAfp = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
-                filepath = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
         
-            self.TransitionStructure.draw_graph(DFAfp)
+        DFAfp = ""
+        filepath = ""
+        if isInfinite:
+            DFAfp = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            filepath = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
+        else:
+            DFAfp = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            filepath = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
+        
+        self.TransitionStructure.draw_graph(DFAfp)
         # File path for json file
-            A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
-            info = {
+        A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
+        info = {
             "adj_List" : str(A),
             "end_states" : str(self.end_states),
             "nodes" : str(self.TransitionStructure.get_nodes()),
@@ -408,29 +408,10 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             "isInfinite" : str(isInfinite)
 
             }
-            with open(filepath, "w") as outfile:
-                json.dump(info, outfile)
-        elif flag == True:
+        with open(filepath, "w") as outfile:
+            json.dump(info, outfile)
+        
 
-            print('in here')
-            test_img_fp = 'result.png'
-            test_json_fp = 'result.json'
-            info = {
-            "adj_List" : str(A),
-            "end_states" : str(self.end_states),
-            "nodes" : str(self.TransitionStructure.get_nodes()),
-            "edges" : str(self.TransitionStructure.get_graph().edges(data='label')),
-            "imgFP" : DFAfp,
-            "isInfinite" : str(isInfinite)
-
-            }
-            self.TransitionStructure.draw_graph(test_img_fp)
-            with open(test_json_fp, "w") as outfile:
-                json.dump(info, outfile)
-            
-        #self.TransitionStructure.draw_graph('result.png')
-        #print(A)
-        #print(self.TransitionStructure.get_graph().edges(data='label'))
         return strings, filtered, isInfinite
 
     def debug(self):
@@ -438,13 +419,16 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         print(f"Edges: {self.TransitionStructure.get_graph().edges(data='label')}")
         
         
-
+# if multiple edges go from point a to point b, just choose 1 of those edges and remove the rest.
+# https://www.geeksforgeeks.org/detect-cycle-in-a-graph/ for updating cycle detection.
+# meeting w/ turbo October 31st
+# Distributed Computing 
 def main():
     # graphical library limitation
     tester = RandomTransitionStructure(4,['a', 'b','c', 'd', 'e', 'f', 'g', 'h']) # clarify this with Turbo on Friday
     tester.generateRandomTransitionStructure()
     #tester.debug()
-    strings, filtered, isInfinite = tester.BFSString(m=1, flag = True)
+    strings, filtered, isInfinite = tester.BFSString(m=4, trial=0)
     #print(strings)
     #print(isInfinite)
 if __name__ == "__main__":
