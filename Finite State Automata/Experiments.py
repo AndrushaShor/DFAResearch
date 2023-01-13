@@ -52,4 +52,5 @@ def writeToCsv(filename, header, data):
         writer.writerows(data)
         #writer.close()
 if __name__ == '__main__':
-    experiments(4)
+    for i in [2,3,4,5]:
+        experiments(i)

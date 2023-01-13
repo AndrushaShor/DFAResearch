@@ -127,6 +127,11 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         self.row = self.computeRow()
         self.end_states = {}
         self.TransitionStructure = None
+        self.TrimmedTransitionStructure = None
+        self.graph = defaultdict(list) # used only for cycle detection
+        self.visited = [] # [False] * self.n
+        self.inpath = [False] * self.n
+        self.has_cycle = False # https://www.algotree.org/algorithms/tree_graph_traversal/depth_first_search/cycle_detection_in_directed_graphs/
 
     def generateRandomTransitionStructure(self, trial=0):
         row = self.computeRow() # part 1
@@ -153,7 +158,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         
         TransitionStruct, order = self.partition_to_transition_structure(partition, self.alphabet, self.n) 
         self.TransitionStructure = self.compute_transition_structure(TransitionStruct, order, trial)
-        
+        self.trimTransitionStructure() # used to compute a transition structure with no duplicate edges
         
         
 
@@ -308,7 +313,72 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         
         return self.TransitionStructure
 
+    def self_loop(self):
+        cycles = []
+        print(self.end_states)
+        print(self.graph)
+        for node in self.graph.keys():
+            if node in self.graph[node] and self.end_states[node] == 'end_state':
+                cycles.append(node) # self loop that is an end state
+                self.graph[node].remove(node)
+            
+            elif node in self.graph[node]:
+                self.graph[node].remove(node)
 
+        print(self.graph)
+        print(cycles)
+        return cycles
+
+
+    def DFS(self, src):
+        self.visited.append(src)
+        if self.end_states[src] == 'end_state':
+            return True
+        for adj_node in self.graph[src]:
+            if adj_node not in self.visited and self.:
+                self.DFS(adj_node)
+
+
+        self.inpath[src] = False
+    
+    # check to see if I can get to these nodes from start state, remove the ones that I cannot get to. 
+    # check to see if i can get from a self loop to end state 
+    def cycle_detection(self): # requires a graph dictionary that is generated at the same time as trimmed transition structure
+        cycles = self.self_loop()
+        
+        if len(cycles) > 0: # if we find loop cycles, return true for infinite language as cycles only contains the nodes that are an end state
+            return True
+        
+        simple_cycles = list(nx.simple_cycles(nx.DiGraph(self.graph)))
+
+        for cycle in simple_cycles:
+            for node in cycle:
+                if self.end_states[node] == 'end_state': # if the cycle contains an end state, we know an infinite language is formed
+                    return True 
+
+            
+
+    def trimTransitionStructure(self): #TODO trimTransitionStructure
+        
+        nodes = self.TransitionStructure.get_graph().nodes()
+        edges = self.TransitionStructure.get_graph().edges(data='label')
+        self.TrimmedTransitionStructure = TransitionStructure()
+        for node in nodes:
+            self.TrimmedTransitionStructure.add_node(node)
+
+        edgesToAdd = {}
+        for edge in edges:
+             k = (edge[0], edge[1])
+             if k not in edgesToAdd.keys():
+                edgesToAdd[k] = edge
+        print(edges)
+        print('-------------')
+        print(edgesToAdd.values())
+        for edge in edgesToAdd.values():
+            self.TrimmedTransitionStructure.add_edge(edge[0], edge[1], edge[2])
+            self.graph[edge[0]].append(edge[1]) # used to convert graph into dictionary format
+        
+        self.TrimmedTransitionStructure.draw_graph('test.png')
     #TODO: Some DFAs might not print any strings.
     # this is by design, and needs to be an edge case that gets hand
     def BFSString(self, m, trial): # change to m -> breaking condition is that if I have a string of 2m + 1 -> infinite language
@@ -318,7 +388,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             return None
         
         print(self.end_states)
-        A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
+        A = nx.to_dict_of_lists(self.TrimmedTransitionStructure.get_graph())
         
         strings = [] # list that will contain all possible strings up to a given length
         if all(value == 'not_end_state' for value in self.end_states.values()): # edge case when no end states
@@ -341,7 +411,8 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
 
         # if and only if we can get into a cycle that contains at least 1 end state in it (good question to figure out probability)
         strlen = 0
-        self.TransitionStructure.draw_graph('result.png')
+        #self.TransitionStructure.draw_graph('result.png')
+        #self.TrimmedTransitionStructure.draw_graph('result1.png')
         # ISSUES: 
         # 1: No way to get to end state
         # Approach: 
@@ -358,8 +429,8 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             for i, vertex in enumerate(A[state]):
                 # if edge exists
                 
-                if self.TransitionStructure.get_edge_info(state, vertex) != 'DNE':
-                    data = self.TransitionStructure.get_edge_info(state, vertex)
+                if self.TrimmedTransitionStructure.get_edge_info(state, vertex) != 'DNE':
+                    data = self.TrimmedTransitionStructure.get_edge_info(state, vertex)
                     # print(f"STATE: {state}. VERTEX: {vertex}. data {data}")
                     for key in data.keys(): 
                         character = data[key]['label']
@@ -371,9 +442,10 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
                         
                                                 
                         strlen = len(currString + character)
-                        print(f"strlen: {strlen}")
+                        #print(f"strlen: {strlen}")
                         #print(f"strings: {len(strings)}")
                         queue.append((vertex, currString + character))
+                
 
         strings = list(set(strings))
         #print(strings)
@@ -388,15 +460,19 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         
         
         DFAfp = ""
+        DFAfpTrim = ""
         filepath = ""
         if isInfinite:
             DFAfp = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            DFAfpTrim = 'InfDFA/Final_Transition_Structure_Trim_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
             filepath = 'InfDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
         else:
             DFAfp = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
+            DFAfpTrim = 'FinDFA/Final_Transition_Structure_Trim_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.png'
             filepath = 'FinDFA/Final_Transition_Structure_' + str(self.n) + '_' + str(len(self.alphabet)) + '_' + str(trial) + '.json' #TODO: LOOK HERE
         
         self.TransitionStructure.draw_graph(DFAfp)
+        self.TrimmedTransitionStructure.draw_graph(DFAfpTrim)
         # File path for json file
         A = nx.to_dict_of_lists(self.TransitionStructure.get_graph())
         info = {
@@ -404,6 +480,7 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
             "end_states" : str(self.end_states),
             "nodes" : str(self.TransitionStructure.get_nodes()),
             "edges" : str(self.TransitionStructure.get_graph().edges(data='label')),
+            "Trimmed_edges" : str(self.TrimmedTransitionStructure.get_graph().edges(data='label')),
             "imgFP" : DFAfp,
             "isInfinite" : str(isInfinite)
 
@@ -413,6 +490,8 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
         
 
         return strings, filtered, isInfinite
+    
+
 
     def debug(self):
         print(f'Nodes: {self.TransitionStructure.get_nodes()}')
@@ -425,11 +504,11 @@ class RandomTransitionStructure: #TODO: self.n, self.alphabet
 # Distributed Computing 
 def main():
     # graphical library limitation
-    tester = RandomTransitionStructure(4,['a', 'b','c', 'd', 'e', 'f', 'g', 'h']) # clarify this with Turbo on Friday
+    tester = RandomTransitionStructure(3,['a', 'b','c']) # clarify this with Turbo on Friday
     tester.generateRandomTransitionStructure()
-    #tester.debug()
-    strings, filtered, isInfinite = tester.BFSString(m=4, trial=0)
-    #print(strings)
-    #print(isInfinite)
+    # print(tester.self_loop())
+    tester.cycle_detection()
+    # print(tester.has_cycle)
+
 if __name__ == "__main__":
     main()

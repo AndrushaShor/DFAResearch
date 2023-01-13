@@ -87,8 +87,8 @@ def visualize2(d, df, xlabel, ylabel):
         plt.title(t, fontsize=10)
         plt.xlabel(xlabel)
         plt.ylabel(ylabel)
-        plt.plot(lengths, inf, label = "Infinite Languages (%)")
-        plt.plot(lengths, fin, label = "Finite Languages (%)")
+        plt.scatter(lengths, inf, label = "Infinite Languages (%)")
+        plt.scatter(lengths, fin, label = "Finite Languages (%)")
         plt.legend()
         
         fp = 'results/states_' + str(state) +  '.png'
@@ -109,8 +109,8 @@ def visualize(d, df, title, xlabel, ylabel, filepath, type=1):
     plt.title(title, fontsize=10)
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
-    plt.plot(states, infinite, label = "Infinite Languages (%)")
-    plt.plot(states, finite, label = "Finite Languages (%)")
+    plt.scatter(states, infinite, label = "Infinite Languages (%)")
+    plt.scatter(states, finite, label = "Finite Languages (%)")
     plt.legend()
     plt.savefig(filepath)
     plt.clf()
